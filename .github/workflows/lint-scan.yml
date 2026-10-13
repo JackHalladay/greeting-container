@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - run: docker build -t local/app:scan
+      - run: docker build -t local/app:scan .
 
       - name: Trivy Vulnerability Scan
         uses: aquasecurity/trivy-action@v0.36.0
