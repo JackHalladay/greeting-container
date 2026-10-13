@@ -1,0 +1,14 @@
+.git
+.gitignore
+.dockerignore
+
+**/__pycache__
+**/*.pyc
+
+.markdownlint-cli2.yaml
+
+LICENSE
+*.md
+
+.idea
+.vscode

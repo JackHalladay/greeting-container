@@ -1,18 +1,32 @@
-FROM python:3.12@sha256:63828510c8b5ccce3bf0d6fabd6f3d17d4effa1ffe690f80a67c8e2d394e03ee
+# syntax=docker/dockerfile:1
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    gcc \
-    curl \
-    vim
+# adopt a multistage build process for efficiency
+FROM python:3.12-alpine@sha256:1b668429b3511ab407d8e00648891631b0b1a4d7e15e3ca70f38ab5b91ad4ab4 AS build
+
+# removed apt-get update and apt-get install to improve efficiency as they're unused and not required
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY app/requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+FROM python:3.12-alpine@sha256:1b668429b3511ab407d8e00648891631b0b1a4d7e15e3ca70f38ab5b91ad4ab4 AS runtime
+
+ENV PATH="/opt/venv/bin:$PATH"
+
+# adding a none root user. Setting this to a uuid so kuberenetes can use it
+RUN addgroup -g 10001 app && adduser -D -u 10001 -G app app
 
 WORKDIR /app
 
-COPY . .
+COPY --from=build /opt/venv /opt/venv
 
-RUN pip install -r app/requirements.txt
+COPY app/ ./app/
+
+USER 10001:10001
 
 EXPOSE 8080
 
-# The whole context was copied to /app, so the app package lives in /app/app.
-CMD ["gunicorn", "--chdir", "app", "--bind", "0.0.0.0:8080", "--workers", "2", "app:app"]
+CMD ["gunicorn", "--chdir", "app", "--bind", "0.0.0.0:8080", "--workers", "2", "--worker-tmp-dir", "/dev/shm", "--access-logfile", "-", "app:app"]
