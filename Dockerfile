@@ -39,6 +39,6 @@ LABEL org.opencontainers.image.title="sample-app" \
 
 # adding a healthcheck for testing purposes. can be removed or ignored when deploying to kuberenetes since it has its own methods for healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:{os.environ.get(\"PORT\", \"8080\")}/healthz', timeout=2)"]
+    CMD ["python", "-c", "import os, urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ.get(\"PORT\", \"8080\")}/healthz', timeout=2)"]
 
 CMD ["sh", "-c", "gunicorn --chdir app --bind 0.0.0.0:${PORT} --workers 2 --worker-tmp-dir /dev/shm --access-logfile - app:app"]
