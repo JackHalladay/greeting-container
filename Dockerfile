@@ -35,7 +35,7 @@ EXPOSE ${PORT}
 LABEL org.opencontainers.image.title="sample-app" \
       org.opencontainers.image.description="Coding test submission for DWP" \
       org.opencontainers.image.source="https://github.com/JackHalladay/greeting-container" \
-      org.opencontainers.image.version="1.0.5"
+      org.opencontainers.image.version="1.0.6"
 
 # adding a healthcheck for testing purposes. can be removed or ignored when deploying to kuberenetes since it has its own methods for healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
